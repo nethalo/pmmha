@@ -194,7 +194,7 @@ if [ $CONFIRMED -eq 0 ]; then
 		sudo docker exec pmm-server chmod +x /srv/pmmpgdump.sh
 
 		echo '{{ Bold "Creating: Inventory supervisord ini files" }}' | gum format -t template
-		sudo docker cp -q qanreplica.ini pmm-server:/etc/supervisord.d/pmmpgdump.ini
+		sudo docker cp -q pmmpgdump.ini pmm-server:/etc/supervisord.d/pmmpgdump.ini
 
 		gum spin --show-output --spinner monkey --title "Loading..." --title.foreground 99 -- sh -c 'sudo docker exec -d pmm-server supervisorctl update &> /dev/null; sleep 5; echo "PMM Primary Set"'
 
