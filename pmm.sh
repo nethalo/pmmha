@@ -185,7 +185,11 @@ if [ $CONFIRMED -eq 0 ]; then
 	if [[ $ACTION == "Set a PMM Primary" ]]; then
 		
 		echo '{{ Bold "Creating: Inventory table on ClickHouse" }}' | gum format -t template
-		sudo docker cp -q metrics.sql pmm-server:/tmp/pgpmm.sql
+		sudo docker cp -q metrics.sql pmm-server:/tmp/metrics.sql
+		sudo docker exec pmm-server chown pmm:pmm /tmp/metrics.sql
+		sudo docker exec pmm-server bash -c "clickhouse-client < /tmp/metrics.sql"
+
+                sudo docker cp -q pgpmm.sql pmm-server:/tmp/pgpmm.sql
 		sudo docker exec pmm-server chown pmm:pmm /tmp/pgpmm.sql
 		sudo docker exec pmm-server bash -c "clickhouse-client < /tmp/pgpmm.sql"
 
