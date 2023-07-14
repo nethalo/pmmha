@@ -203,7 +203,7 @@ if [ $CONFIRMED -eq 0 ]; then
 
 		echo '{{ Bold "Adding: ClickHouse Port Forwarding" }}' | gum format -t template
 		docker ps -a --format '{{.Names}}' | grep -q socatpmm
-		if [ $? -eq 0 ]; then
+		if [ $? -eq 1 ]; then
 			TARGET_PORT=9000
 			HOST_PORT=9000
 			TARGET_IP=$(docker inspect -f '{{range.NetworkSettings.Networks}}{{.IPAddress}}{{end}}' pmm-server)
