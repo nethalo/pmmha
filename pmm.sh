@@ -200,6 +200,19 @@ if [ $CONFIRMED -eq 0 ]; then
 		echo '{{ Bold "Creating: Inventory supervisord ini files" }}' | gum format -t template
 		sudo docker cp -q pmmpgdump.ini pmm-server:/etc/supervisord.d/pmmpgdump.ini
 
+
+		echo '{{ Bold "Adding: ClickHouse Port Forwarding" }}' | gum format -t template
+		docker ps -a --format '{{.Names}}' | grep -q socatpmm
+		if [ $? -eq 0 ]; then
+			TARGET_PORT=9000
+			HOST_PORT=9000
+			TARGET_IP=$(docker inspect -f '{{range.NetworkSettings.Networks}}{{.IPAddress}}{{end}}' pmm-server)
+			NETWORK=$(docker inspect -f '{{range $net,$v := .NetworkSettings.Networks}}{{printf "%s" $net}}{{end}}' pmm-server)
+
+			docker run -d --publish ${HOST_PORT}:${TARGET_PORT} --network ${NETWORK} --name socatpmm alpine/socat socat TCP-LISTEN:${TARGET_PORT},fork TCP-CONNECT:${TARGET_IP}:${TARGET_PORT}
+		fi
+
+
 		gum spin --show-output --spinner monkey --title "Loading..." --title.foreground 99 -- sh -c 'sudo docker exec -d pmm-server supervisorctl update &> /dev/null; sleep 5; echo "PMM Primary Set"'
 
 	fi
