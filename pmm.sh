@@ -19,7 +19,7 @@ function sendAlert () {
         if [ -e "$errorFile" ]
         then
                 alertMsg=$(cat $errorFile)
-                echo -e "${alertMsg}" #| mailx -s "[$HOSTNAME] ALERT XtraBackup backup" "${email}"
+                echo -e "${alertMsg}" #| mailx -s "[$HOSTNAME] ALERT " "${email}"
         fi
 }
 
