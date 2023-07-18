@@ -74,9 +74,8 @@ function installGum () {
 	which rpm &> /dev/null
 	EXITSTATUS=$?
 	if [ $EXITSTATUS -eq 0 ]; then
-		echo "coming soon"
-		# wget https://github.com/charmbracelet/gum/releases/download/v0.10.0/gum_0.10.0_amd64.deb
-		# dpkg -i gum_0.10.0_amd64.deb
+		curl -OL https://github.com/charmbracelet/gum/releases/download/v0.10.0/gum-0.10.0.x86_64.rpm
+		sudo rpm -i gum-0.10.0.x86_64.rpm
 		return 0
 	fi
 }
@@ -85,7 +84,7 @@ function installGum () {
 function verifyGum () {
 	which gum &> /dev/null
 	EXITSTATUS=$?
-    verifyExecution "$EXITSTATUS" "Cannot find gum tool" false
+        #verifyExecution "$EXITSTATUS" "Cannot find gum tool" false
 
     if [ $EXITSTATUS -eq 0 ]; then
 		logInfo "[OK] Found 'gum' bin"
