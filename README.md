@@ -1,4 +1,4 @@
-# PMM HA
+# Percona Monitroring and Management High Availability
 Percona Monitoring and Management High Availability - PMM HA
 
 This method provides means to:
