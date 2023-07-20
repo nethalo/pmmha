@@ -15,3 +15,55 @@ This method provides means to:
 
 
 Works on Docker 23.0.3 and higher
+
+## What is under the hood?
+
+Simply put, there are 3 main things replicated: 
+
+VictoriaMetrics time series data
+Inventory+conf info from PostgreSQL
+ClickHouse metrics table
+
+### VictoriaMetrics
+
+Federation is what is being used. A new scrape is configured tothe gather metrics via federate from the primary and stores it locally on the secondary:
+
+```yaml
+scrape_configs:
+  - job_name: $jobname
+    honor_timestamps: true
+    scrape_interval: 5s
+    scrape_timeout: 4s
+    metrics_path: /prometheus/federate?match[]={__name__=~".*"}
+    scheme: $scheme
+    tls_config:
+      insecure_skip_verify: true
+    basic_auth:
+      username: $user
+      password: $pass
+    static_configs:
+      - targets:
+          - "$host:$port"
+```
+
+### PostgreSQL
+
+A pg_dump of the pmm-managed schema is made, stored into a FILE table inside the primary ClickHouse and the Secondary will read the contents of that table via the REMOTE function of ClickHouse and will restore the dump.
+
+The FILE table is defined as
+
+`CREATE TABLE IF NOT EXISTS pmm.pgpmm (dump String) ENGINE = File(RawBLOB);`
+
+And the dump is
+
+```bash
+pg_dump -Upmm-managed --dbname=pmm-managed --inserts --data-only --disable-triggers > /srv/clickhouse/data/pmm/pgpmm/data.RawBLOB
+```
+
+### ClickHouse
+
+For QAN data, the same REMOTE functionality is used. However, to achieve data Deduplication, an intermediate table is created with the engine ReplacingMergeTree so that way when forcing a Merge, data is consolidated. 
+
+The remote functionality is a simple as this query
+
+`select * from remote('$pmmserver', pmm.metrics)`
