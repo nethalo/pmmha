@@ -203,12 +203,13 @@ if [ $CONFIRMED -eq 0 ]; then
 		echo '{{ Bold "Adding: ClickHouse Port Forwarding" }}' | gum format -t template
 		docker ps -a --format '{{.Names}}' | grep -q socatpmm
 		if [ $? -eq 1 ]; then
-			TARGET_PORT=9000
-			HOST_PORT=9000
-			TARGET_IP=$(docker inspect -f '{{range.NetworkSettings.Networks}}{{.IPAddress}}{{end}}' pmm-server)
-			NETWORK=$(docker inspect -f '{{range $net,$v := .NetworkSettings.Networks}}{{printf "%s" $net}}{{end}}' pmm-server)
+			#TARGET_PORT=9000
+			#HOST_PORT=9000
+			#TARGET_IP=$(docker inspect -f '{{range.NetworkSettings.Networks}}{{.IPAddress}}{{end}}' pmm-server)
+			#NETWORK=$(docker inspect -f '{{range $net,$v := .NetworkSettings.Networks}}{{printf "%s" $net}}{{end}}' pmm-server)
 
-			docker run -d --publish ${HOST_PORT}:${TARGET_PORT} --network ${NETWORK} --name socatpmm alpine/socat socat TCP-LISTEN:${TARGET_PORT},fork TCP-CONNECT:${TARGET_IP}:${TARGET_PORT}
+			#docker run -d --publish ${HOST_PORT}:${TARGET_PORT} --network ${NETWORK} --name socatpmm alpine/socat socat TCP-LISTEN:${TARGET_PORT},fork TCP-CONNECT:${TARGET_IP}:${TARGET_PORT}
+                        docker run --detach --restart unless-stopped --publish 9000:9000 --link pmm-server:target --name socatpmm alpine/socat tcp-listen:9000,fork,reuseaddr tcp-connect:target:9000
 		fi
 
 
