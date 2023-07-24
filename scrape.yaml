@@ -1,8 +1,8 @@
 scrape_configs:
-  - job_name: $jobname
+  - job_name: pmmha
     honor_timestamps: true
-    scrape_interval: 5s
-    scrape_timeout: 4s
+    scrape_interval: 2s
+    scrape_timeout: 1s
     metrics_path: /prometheus/federate?match[]={__name__=~".*"}
     scheme: $scheme
     tls_config:
