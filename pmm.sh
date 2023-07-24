@@ -135,9 +135,9 @@ if [ $CONFIRMED -eq 0 ]; then
 		PRIMARY=$(gum input --header="Host / IP of the Primary PMM server" --placeholder "192.168.1.10" --prompt.foreground="99" --cursor.foreground="99" --header.foreground="240")
 		# PORT=$(gum input --header="PORT (Default: 443)" --placeholder "443")
 		PORT="443"
-		USER=$(gum input --header="Primary PMM USER" --placeholder "admin")
+		USER=$(gum input --header="Primary PMM USER" --value "admin" --placeholder "admin")
 		PASS=$(gum input --password  --header="Primary PMM PASSWORD")
-		JOBNAME=$(gum input --header="Name of the scrapper" --placeholder "vm-primary")
+		# JOBNAME=$(gum input --header="Name of the scrapper" --placeholder "vm-primary")
 		# SCHEME=$(gum input --header="http or https" --placeholder="https")
 		SCHEME="https"
 
