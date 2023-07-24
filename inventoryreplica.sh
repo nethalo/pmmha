@@ -10,8 +10,5 @@ while true; do
   echo "Running time psql -Upmm-managed --dbname=pmm-managed -f /tmp/pgpmm.sql"
   psql -Upmm-managed --dbname=pmm-managed -f /tmp/pgpmm.sql &> /dev/null
   echo $?
-  echo "Running e psql -Upmm-managed --dbname=pmm-managed -c  \"update agents set disabled = 't'\""
-  psql -Upmm-managed --dbname=pmm-managed -c  "update agents set disabled = 't'"
-  echo $?
   sleep 15m
 done
