@@ -13,16 +13,31 @@ This method provides means to:
 - Prepare it to act as a Secondary
 - Establish replication
 
+## Prerequisites
 
-Works on Docker 23.0.3 and higher
+- Docker 23.0.3 and higher
+- Docker installation will fail if on Amazon Linux or RHEL9/EL9 (unless you are on a s390x architecture machine), since the [Percona Easy-Install script](https://docs.percona.com/percona-monitoring-and-management/setting-up/server/easy-install.html) relies on the [Get Docker](https://get.docker.com/) script for the docker install. You will need to install docker on your own on those cases
+- SSH Access to the host servers
+- sudo capabilities
+
+## Install & Run
+
+Clone the repo and run the pmm.sh server
+
+```bash
+git clone https://github.com/nethalo/pmmha.git
+cd pmmha
+bash pmm.sh
+```
+Select the desired option and that's it.
 
 ## What is under the hood?
 
 Simply put, there are 3 main things replicated: 
 
-VictoriaMetrics time series data
-Inventory+conf info from PostgreSQL
-ClickHouse metrics table
+- VictoriaMetrics time series data
+- Inventory+conf info from PostgreSQL
+- ClickHouse metrics table
 
 ### VictoriaMetrics
 
@@ -30,10 +45,10 @@ Federation is what is being used. A new scrape is configured tothe gather metric
 
 ```yaml
 scrape_configs:
-  - job_name: $jobname
+  - job_name: pmmha
     honor_timestamps: true
-    scrape_interval: 5s
-    scrape_timeout: 4s
+    scrape_interval: 2s
+    scrape_timeout: 1s
     metrics_path: /prometheus/federate?match[]={__name__=~".*"}
     scheme: $scheme
     tls_config:
