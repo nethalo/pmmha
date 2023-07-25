@@ -65,7 +65,7 @@ function installGum () {
 	which dpkg &> /dev/null
 	EXITSTATUS=$?
 	if [ $EXITSTATUS -eq 0 ]; then
-		wget https://github.com/charmbracelet/gum/releases/download/v0.10.0/gum_0.10.0_amd64.deb
+		curl -OL https://github.com/charmbracelet/gum/releases/download/v0.10.0/gum_0.10.0_amd64.deb
 		dpkg -i gum_0.10.0_amd64.deb
 		logInfo "[OK] Installed 'gum' bin"
 		return 0
@@ -96,7 +96,7 @@ function verifyGum () {
 
 
 function installPMM () {
-	wget -O - https://www.percona.com/get/pmm | /bin/bash
+	curl -L https://www.percona.com/get/pmm | /bin/bash
 }
 
 function pmmheader () {
