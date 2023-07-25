@@ -19,6 +19,7 @@ This method provides means to:
 - Docker installation will fail if on Amazon Linux or RHEL9/EL9 (unless you are on a s390x architecture machine), since the [Percona Easy-Install script](https://docs.percona.com/percona-monitoring-and-management/setting-up/server/easy-install.html) relies on the [Get Docker](https://get.docker.com/) script for the docker install. You will need to install docker on your own on those cases
 - SSH Access to the host servers
 - sudo capabilities
+- Ports 443 and 9000 accessible from outside the Primary host machine
 
 ## Install & Run
 
