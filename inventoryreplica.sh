@@ -10,5 +10,5 @@ while true; do
   echo "Running time psql -Upmm-managed --dbname=pmm-managed -f /tmp/pgpmm.sql"
   psql -Upmm-managed --dbname=pmm-managed -f /tmp/pgpmm.sql &> /dev/null
   echo $?
-  sleep 15m
+  sleep 2m
 done
