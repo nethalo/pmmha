@@ -30,7 +30,18 @@ git clone https://github.com/nethalo/pmmha.git
 cd pmmha
 bash pmm.sh
 ```
-Select the desired option and that's it.
+You will be presented with the available options. First one is straightforward: Install PMM from scratch.
+
+### Set Primary & Replica
+
+Both Primary and Replica requires some preparation. Follow the steps below:
+
+| Setup a Replica | Setup a Primary
+|------|------|
+|    <br>Choose the option **Set PMM Replica**:<br> <img src="setpmmreplica.png" alt="Set Replica" width="220" height="100" /> |   <br>Choose the option **Set PMM Replica**:<br><img src="setpmmprimary.png" alt="Set Primary" width="220" height="100" /> | 
+|    <br>**Confirm**<br><img src="confirmset.png" alt="Confirm Replica" width="220" height="80" /><br> | **Confirm** | 
+|    <br>Enter the info for Host, User and Password of the Primary PMM<br><img src="inputexample.png" alt="Input" width="300" height="150" /> | No additional info needed :) | 
+|    <br><br>Steps will be performed<br><img src="replicasteps.png" alt="Primary Steps" width="400" height="250" /> <br>Wait for the steps to finish and you are all set!<br>    |    Confirm it and steps will be performed<br><img src="primarysteps.png" alt="Primary Steps" width="400" height="200" />   |
 
 ## What is under the hood?
 
