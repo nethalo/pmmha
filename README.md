@@ -39,6 +39,7 @@ Simply put, there are 3 main things replicated:
 - VictoriaMetrics time series data
 - Inventory+conf info from PostgreSQL
 - ClickHouse metrics table
+- SQLite info: Grafana Dashboards/Users/Roles/etc, Alerts, PMM Managed Backups (for MongoDB)
 
 ### VictoriaMetrics
 
@@ -83,3 +84,19 @@ For QAN data, the same REMOTE functionality is used. However, to achieve data De
 The remote functionality is a simple as this query
 
 `select * from remote('$pmmserver', pmm.metrics)`
+
+### SQLite
+
+Again, For SQLite data, the same REMOTE functionality is used.
+
+Dump is made per table to divide the dashboard ones from the rest, due to size
+
+```bash
+sqlite3 /srv/grafana/grafana.db ".dump --nosys --data-only --newlines --preserve-rowids dashboard dashboard_version" > /srv/clickhouse/data/pmm/sqlitedash/data.RawBLOB
+```
+
+The remote functionality is a simple as this query
+
+```bash
+clickhouse-client --format=PrettySpaceNoEscapes --multiquery --database pmm --query="SET output_format_pretty_max_rows=10000000000000; SET output_format_pretty_max_column_pad_width=10; SET output_format_pretty_max_value_width=100000000; select * from remote('$pmmserver', pmm.sqlitedash)"
+```
