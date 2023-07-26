@@ -133,12 +133,9 @@ if [ $CONFIRMED -eq 0 ]; then
 		echo "# Using VictoriaMetrics Federation" | gum format 
 		echo ":candy:" | gum format -t emoji
 		PRIMARY=$(gum input --header="Host / IP of the Primary PMM server" --placeholder "192.168.1.10" --prompt.foreground="99" --cursor.foreground="99" --header.foreground="240")
-		# PORT=$(gum input --header="PORT (Default: 443)" --placeholder "443")
 		PORT="443"
 		USER=$(gum input --header="Primary PMM USER" --value "admin" --placeholder "admin")
 		PASS=$(gum input --password  --header="Primary PMM PASSWORD")
-		# JOBNAME=$(gum input --header="Name of the scrapper" --placeholder "vm-primary")
-		# SCHEME=$(gum input --header="http or https" --placeholder="https")
 		SCHEME="https"
 
         clear
@@ -173,9 +170,21 @@ if [ $CONFIRMED -eq 0 ]; then
 		sudo docker cp -q inventoryreplica.sh pmm-server:/srv/inventoryreplica.sh
 		sudo docker exec pmm-server chmod +x /srv/inventoryreplica.sh
 
+
 		echo '{{ Bold "Creating: QAN and Inventory supervisord ini files" }}' | gum format -t template
 		sudo docker cp -q qanreplica.ini pmm-server:/etc/supervisord.d/qanreplica.ini
 		sudo docker cp -q inventoryreplica.ini pmm-server:/etc/supervisord.d/inventoryreplica.ini
+
+		echo '{{ Bold "Creating: SQLite replica scripts" }}' | gum format -t template
+		sudo docker cp -q restoresqlitepmm.sh pmm-server:/srv/restoresqlitepmm.sh
+		sudo docker exec pmm-server chmod +x /srv/restoresqlitepmm.sh
+		sudo docker cp -q restoresqlitedash.sh pmm-server:/srv/restoresqlitedash.sh
+		sudo docker exec pmm-server chmod +x /srv/restoresqlitedash.sh
+
+		echo '{{ Bold "Creating: SQLite supervisord ini files" }}' | gum format -t template
+		sudo docker cp -q restoresqlitepmm.ini pmm-server:/etc/supervisord.d/restoresqlitepmm.ini
+		sudo docker cp -q restoresqlitedash.ini pmm-server:/etc/supervisord.d/restoresqlitedash.ini
+
 		gum spin --show-output --spinner monkey --title "Loading..." --title.foreground 99 -- sh -c 'sudo docker exec -d pmm-server supervisorctl restart pmm-agent &> /dev/null; sleep 5; echo "PMM Metrics Replica set"'
 		gum spin --show-output --spinner monkey --title "Loading..." --title.foreground 99 -- sh -c 'sudo docker exec -d pmm-server supervisorctl update &> /dev/null; sleep 5; echo "PMM QAN + Inventory Replica set"'
 
@@ -184,10 +193,6 @@ if [ $CONFIRMED -eq 0 ]; then
 	if [[ $ACTION == "Set a PMM Primary" ]]; then
 		
 		echo '{{ Bold "Creating: Inventory table on ClickHouse" }}' | gum format -t template
-		sudo docker cp -q metrics.sql pmm-server:/tmp/metrics.sql
-		sudo docker exec pmm-server chown pmm:pmm /tmp/metrics.sql
-		sudo docker exec pmm-server bash -c "clickhouse-client < /tmp/metrics.sql"
-
                 sudo docker cp -q pgpmm.sql pmm-server:/tmp/pgpmm.sql
 		sudo docker exec pmm-server chown pmm:pmm /tmp/pgpmm.sql
 		sudo docker exec pmm-server bash -c "clickhouse-client < /tmp/pgpmm.sql"
@@ -199,19 +204,31 @@ if [ $CONFIRMED -eq 0 ]; then
 		echo '{{ Bold "Creating: Inventory supervisord ini files" }}' | gum format -t template
 		sudo docker cp -q pmmpgdump.ini pmm-server:/etc/supervisord.d/pmmpgdump.ini
 
+		echo '{{ Bold "Creating: sqlite tables on ClickHouse" }}' | gum format -t template
+		sudo docker cp -q sqlitepmm.sql pmm-server:/tmp/sqlitepmm.sql
+		sudo docker exec pmm-server chown pmm:pmm /tmp/sqlitepmm.sql
+		sudo docker exec pmm-server bash -c "clickhouse-client < /tmp/sqlitepmm.sql"
+
+                sudo docker cp -q sqlitedash.sql pmm-server:/tmp/sqlitedash.sql
+		sudo docker exec pmm-server chown pmm:pmm /tmp/sqlitedash.sql
+		sudo docker exec pmm-server bash -c "clickhouse-client < /tmp/sqlitedash.sql"
+
+		echo '{{ Bold "Creating: SQLite primary script" }}' | gum format -t template
+		sudo docker cp -q sqlitepmm.sh pmm-server:/srv/sqlitepmm.sh
+		sudo docker exec pmm-server chmod +x /srv/sqlitepmm.sh
+
+		sudo docker cp -q sqlitedash.sh pmm-server:/srv/sqlitedash.sh
+		sudo docker exec pmm-server chmod +x /srv/sqlitedash.sh
+
+		echo '{{ Bold "Creating: sqlite supervisord ini files" }}' | gum format -t template
+		sudo docker cp -q sqlitepmm.ini pmm-server:/etc/supervisord.d/sqlitepmm.ini
+		sudo docker cp -q sqlitedash.ini pmm-server:/etc/supervisord.d/sqlitedash.ini
 
 		echo '{{ Bold "Adding: ClickHouse Port Forwarding" }}' | gum format -t template
 		docker ps -a --format '{{.Names}}' | grep -q socatpmm
 		if [ $? -eq 1 ]; then
-			#TARGET_PORT=9000
-			#HOST_PORT=9000
-			#TARGET_IP=$(docker inspect -f '{{range.NetworkSettings.Networks}}{{.IPAddress}}{{end}}' pmm-server)
-			#NETWORK=$(docker inspect -f '{{range $net,$v := .NetworkSettings.Networks}}{{printf "%s" $net}}{{end}}' pmm-server)
-
-			#docker run -d --publish ${HOST_PORT}:${TARGET_PORT} --network ${NETWORK} --name socatpmm alpine/socat socat TCP-LISTEN:${TARGET_PORT},fork TCP-CONNECT:${TARGET_IP}:${TARGET_PORT}
                         docker run --detach --restart unless-stopped --publish 9000:9000 --link pmm-server:target --name socatpmm alpine/socat tcp-listen:9000,fork,reuseaddr tcp-connect:target:9000
 		fi
-
 
 		gum spin --show-output --spinner monkey --title "Loading..." --title.foreground 99 -- sh -c 'sudo docker exec -d pmm-server supervisorctl update &> /dev/null; sleep 5; echo "PMM Primary Set"'
 
