@@ -1,0 +1,9 @@
+#!/bin/bash
+
+while true; do
+  # Your command here
+  echo "Running sqlite3 /srv/grafana/grafana.db \".dump --nosys --data-only --newlines --preserve-rowids alert alert_configuration alert_image alert_instance alert_notification alert_notification_state alert_rule alert_rule_tag alert_rule_version annotation annotation_tag api_key builtin_role cache_data correlation dashboard_acl dashboard_provisioning dashboard_public dashboard_snapshot dashboard_tag data_keys data_source entity_event file file_meta kv_store library_element library_element_connection login_attempt ngalert_configuration org org_user permission playlist playlist_item plugin_setting preferences provenance_type query_history query_history_star quota role secrets seed_assignment server_lock session short_url star tag team team_member team_role temp_user test_data user user_auth user_auth_token user_role\" > /srv/clickhouse/data/pmm/sqlitepmm/data.RawBLOB"
+  sqlite3 /srv/grafana/grafana.db ".dump --nosys --data-only --newlines --preserve-rowids alert alert_configuration alert_image alert_instance alert_notification alert_notification_state alert_rule alert_rule_tag alert_rule_version annotation annotation_tag api_key builtin_role cache_data correlation dashboard_acl dashboard_provisioning dashboard_public dashboard_snapshot dashboard_tag data_keys data_source entity_event file file_meta kv_store library_element library_element_connection login_attempt ngalert_configuration org org_user permission playlist playlist_item plugin_setting preferences provenance_type query_history query_history_star quota role secrets seed_assignment server_lock session short_url star tag team team_member team_role temp_user test_data user user_auth user_auth_token user_role" > /srv/clickhouse/data/pmm/sqlitepmm/data.RawBLOB
+  echo $?
+  sleep 1m
+done

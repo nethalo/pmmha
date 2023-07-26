@@ -1,0 +1,1 @@
+CREATE TABLE IF NOT EXISTS pmm.sqlitedash (dump String) ENGINE = File(RawBLOB);
