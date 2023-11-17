@@ -243,6 +243,21 @@ if [ $CONFIRMED -eq 0 ]; then
 
                 fi
 
+                if [ $VERVAL -ge 40 ]; then
+                        echo '{{ Bold "Creating: Grafana table on ClickHouse" }}' | gum format -t template
+                        sudo docker cp -q pggrafana.sql pmm-server:/tmp/pggrafana.sql
+                        sudo docker exec pmm-server chown pmm:pmm /tmp/pggrafana.sql
+                        sudo docker exec pmm-server bash -c "clickhouse-client < /tmp/pggrafana.sql"
+
+                        echo '{{ Bold "Creating: Grafana primary script" }}' | gum format -t template
+                        sudo docker cp -q pmmgrafanadump.sh pmm-server:/srv/pmmgrafanadump.sh
+                        sudo docker exec pmm-server chmod +x /srv/pmmgrafanadump.sh
+
+                        echo '{{ Bold "Creating: grafana supervisord ini files" }}' | gum format -t template
+                        sudo docker cp -q pmmgrafanadump.ini pmm-server:/etc/supervisord.d/pmmgrafanadump.ini
+
+                fi
+
                 echo '{{ Bold "Adding: ClickHouse Port Forwarding" }}' | gum format -t template
                 docker ps -a --format '{{.Names}}' | grep -q socatpmm
                 if [ $? -eq 1 ]; then
