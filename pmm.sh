@@ -197,6 +197,15 @@ if [ $CONFIRMED -eq 0 ]; then
 
                 fi
 
+                if [ $VERVAL -ge 40 ]; then
+                        echo '{{ Bold "Creating: Grafana replica scripts" }}' | gum format -t template
+                        sudo docker cp -q grafanareplica.sh pmm-server:/srv/grafanareplica.sh
+                        sudo docker exec pmm-server chmod +x /srv/grafanareplica.sh
+
+                        echo '{{ Bold "Creating: Grafana supervisord ini files" }}' | gum format -t template
+                        sudo docker cp -q grafanareplica.ini pmm-server:/etc/supervisord.d/grafanareplica.ini
+                fi
+
                 gum spin --show-output --spinner monkey --title "Loading..." --title.foreground 99 -- sh -c 'sudo docker exec -d pmm-server supervisorctl restart pmm-agent &> /dev/null; sleep 5; echo "PMM Metrics Replica set"'
                 gum spin --show-output --spinner monkey --title "Loading..." --title.foreground 99 -- sh -c 'sudo docker exec -d pmm-server supervisorctl update &> /dev/null; sleep 5; echo "PMM QAN + Inventory Replica set"'
 
