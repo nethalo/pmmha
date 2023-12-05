@@ -76,10 +76,28 @@ function installGum () {
         if [ $EXITSTATUS -eq 0 ]; then
                 curl -OL https://github.com/charmbracelet/gum/releases/download/v0.10.0/gum-0.10.0.x86_64.rpm
                 sudo rpm -i gum-0.10.0.x86_64.rpm
+                logInfo "[OK] Installed 'gum' bin"
                 return 0
         fi
 }
 
+function installJq () {
+        which dpkg &> /dev/null
+        EXITSTATUS=$?
+        if [ $EXITSTATUS -eq 0 ]; then
+                sudo apt install -y jq
+                logInfo "[OK] Installed 'jq' bin"
+                return 0
+        fi
+
+        which rpm &> /dev/null
+        EXITSTATUS=$?
+        if [ $EXITSTATUS -eq 0 ]; then
+                sudo yum install -y jq
+                logInfo "[OK] Installed 'jq' bin"
+                return 0
+        fi
+}
 
 function verifyGum () {
         which gum &> /dev/null
@@ -94,6 +112,19 @@ function verifyGum () {
         installGum
 }
 
+
+function verifyJq () {
+        which jq  &> /dev/null
+        EXITSTATUS=$?
+        #verifyExecution "$EXITSTATUS" "Cannot find gum tool" false
+
+    if [ $EXITSTATUS -eq 0 ]; then
+                logInfo "[OK] Found 'jq' bin"
+                return 0
+        fi
+
+        installJq
+}
 
 function installPMM () {
         curl -L https://www.percona.com/get/pmm | /bin/bash
